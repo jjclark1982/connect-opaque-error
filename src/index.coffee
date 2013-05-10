@@ -10,8 +10,10 @@ module.exports = (err, req, res, next)->
             err.status = status
         when "[object String]"
             err = new Error(err)
-    status = err.status or res.statusCode or 500
-    err.name = http.STATUS_CODES[status]
+
+    if (err.status) then res.statusCode = err.status
+    if (res.statusCode < 400) then res.statusCode = 500
+    err.name = http.STATUS_CODES[res.statusCode]
     err.message or= "cannot #{req.method} #{req.path}"
 
     connect.errorHandler.title = 'Server Error'
